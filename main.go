@@ -4,22 +4,31 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"syscall"
 
 	"github.com/sheeps92/find-last-author-commit/src"
+	"golang.org/x/term"
 )
 
 func run(org string) string {
-	creds := src.Creds()
+	fmt.Print("Enter personal access token:")
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Printf("\n\n")
+	}
+	creds := src.Creds(bytePassword)
 	repoList := src.ListRepos(org, creds)
 	for _, repo := range repoList {
-		log.Printf("### Finding author commit timestamp in repo: %s ###\n", repo)
+		fmt.Printf("### Finding author commit timestamp in repo: %s ###\n", repo)
 		users := src.FindUsers(org, repo, creds)
 		d := src.FindCommit(org, repo, users, creds)
 
 		for _, commiter := range d {
 			fmt.Printf("User: %s last commit was %s", commiter.User, commiter.Date)
 		}
-		log.Printf("### Ending search in repo: %s ###\n", repo)
+		fmt.Printf("### Ending search in repo: %s ###\n\n", repo)
 	}
 	return ""
 }

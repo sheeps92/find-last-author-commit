@@ -25,6 +25,10 @@ func run(org string) string {
 }
 
 func main() {
+	if len(os.Args) < 2 {
+		log.Fatalf("Invalid number of args. Please enter owner as first arg. ex. .\\find-last-author-commit.exe <owner>")
+		os.Exit(1)
+	}
 	if err := run(os.Args[1]); err != "" {
 		log.Fatal(err)
 	}
